@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
+import os
 from app.config import settings
 from app.database import engine, Base, SessionLocal
 from app.seed_data import seed_enterprise_demonstration
@@ -44,6 +45,11 @@ app = FastAPI(
     description="Enterprise-Grade AI-Powered Software Supply Chain Risk Intelligence & Attack Propagation Platform",
     lifespan=lifespan
 )
+
+if os.environ.get("VERCEL"):
+    Base.metadata.create_all(bind=engine)
+    with SessionLocal() as _session:
+        seed_enterprise_demonstration(_session)
 
 # CORS Configuration
 app.add_middleware(
