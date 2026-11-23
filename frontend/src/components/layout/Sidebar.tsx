@@ -13,16 +13,19 @@ import {
   BellRing,
   FileSpreadsheet,
   ShieldCheck,
-  ChevronRight
+  ChevronRight,
+  Lock
 } from 'lucide-react';
 
 interface SidebarProps {
   currentView: string;
   onSelectView: (view: string) => void;
   alertCount?: number;
+  userRole?: string;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentView, onSelectView, alertCount = 2 }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ currentView, onSelectView, alertCount = 2, userRole }) => {
+  const isAdmin = userRole === 'super_admin' || userRole === 'org_admin';
   const navItems = [
     { id: 'dashboard', label: 'Operations Overview', icon: LayoutDashboard, badge: null },
     { id: 'assets', label: 'Asset Discovery', icon: Boxes, badge: null },
@@ -106,6 +109,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onSelectView, ale
             </button>
           );
         })}
+
+        {isAdmin && (
+          <div className="pt-4 mt-4 border-t border-slate-800/80">
+            <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-indigo-400 font-mono">
+              Administration
+            </div>
+            <button
+              onClick={() => onSelectView('admin')}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition-all group ${
+                currentView === 'admin'
+                  ? 'bg-indigo-500/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-sm shadow-indigo-500/10'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Lock
+                  className={`w-4 h-4 transition-colors ${
+                    currentView === 'admin' ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-300'
+                  }`}
+                />
+                <span className="tracking-wide">Admin Console</span>
+              </div>
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                Admin
+              </span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Footer System Status */}

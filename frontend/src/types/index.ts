@@ -6,6 +6,8 @@ export interface User {
   org_id?: string;
   organization_id?: string;
   org_name?: string;
+  is_active?: boolean;
+  last_login?: string;
   created_at?: string;
 }
 
@@ -218,4 +220,38 @@ export interface SecurityAlert {
   is_acknowledged: boolean;
   acknowledged_by?: string;
   created_at: string;
+}
+
+export interface AdminOverview {
+  environment: string;
+  database_engine: string;
+  total_users: number;
+  active_users: number;
+  total_applications: number;
+  total_sboms: number;
+  total_vulnerabilities: number;
+  total_audit_logs: number;
+  unacknowledged_alerts: number;
+  docs_enabled: boolean;
+}
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  full_name: string;
+  role: string;
+  org_id: string;
+  is_active: boolean;
+  last_login?: string;
+  created_at?: string;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  action: string;
+  user_id?: string;
+  user_email: string;
+  target_resource: string;
+  details: Record<string, any>;
+  timestamp?: string;
 }

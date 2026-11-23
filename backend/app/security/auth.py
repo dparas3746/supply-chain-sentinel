@@ -48,10 +48,6 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     if not token:
-        # Fallback to default user in development mode
-        user = db.query(User).order_by(User.created_at.asc()).first()
-        if user:
-            return user
         raise credentials_exception
 
     try:

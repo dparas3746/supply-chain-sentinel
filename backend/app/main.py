@@ -19,6 +19,7 @@ from app.api.routes_remediation import router as remediation_router
 from app.api.routes_suppliers import router as suppliers_router
 from app.api.routes_alerts import router as alerts_router
 from app.api.routes_reports import router as reports_router
+from app.api.routes_admin import router as admin_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("sentinel.main")
@@ -39,10 +40,15 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down database connection pool...")
     engine.dispose()
 
+is_production = settings.ENVIRONMENT.lower() == "production"
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     description="Enterprise-Grade AI-Powered Software Supply Chain Risk Intelligence & Attack Propagation Platform",
+    docs_url=None if is_production else "/docs",
+    redoc_url=None if is_production else "/redoc",
+    openapi_url=None if is_production else "/openapi.json",
     lifespan=lifespan
 )
 
@@ -100,6 +106,7 @@ app.include_router(remediation_router, prefix=settings.API_V1_STR)
 app.include_router(suppliers_router, prefix=settings.API_V1_STR)
 app.include_router(alerts_router, prefix=settings.API_V1_STR)
 app.include_router(reports_router, prefix=settings.API_V1_STR)
+app.include_router(admin_router, prefix=settings.API_V1_STR)
 
 @app.get("/health", tags=["Health"])
 def health_check():

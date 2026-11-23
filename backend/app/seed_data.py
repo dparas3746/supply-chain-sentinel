@@ -7,11 +7,24 @@ from app.models.sbom import Supplier, SBOMDocument, Component, DependencyRelatio
 from app.models.vulnerability import Vulnerability, ComponentVulnerability
 from app.models.remediation import RemediationTask, SecurityAlert
 from app.security.auth import get_password_hash
+from app.config import settings
 
 def seed_enterprise_demonstration(db: Session):
     # Check if already seeded
     existing = db.query(Organization).filter(Organization.slug == "gflc").first()
     if existing:
+        admin_email = settings.ADMIN_EMAIL.strip().lower()
+        existing_admin = db.query(User).filter(User.email == admin_email).first()
+        if not existing_admin:
+            db.add(User(
+                org_id=existing.id,
+                email=admin_email,
+                hashed_password=get_password_hash(settings.ADMIN_PASSWORD),
+                full_name=settings.ADMIN_FULL_NAME,
+                role="super_admin",
+                is_active=True
+            ))
+            db.commit()
         return
 
     now = datetime.datetime.now(datetime.timezone.utc)
@@ -38,9 +51,9 @@ def seed_enterprise_demonstration(db: Session):
     users = [
         User(
             org_id=org.id,
-            email="admin@sentinel.defense.org",
-            hashed_password=get_password_hash("SentinelAdmin2026!"),
-            full_name="Col. Marcus Vance",
+            email=settings.ADMIN_EMAIL.strip().lower(),
+            hashed_password=get_password_hash(settings.ADMIN_PASSWORD),
+            full_name=settings.ADMIN_FULL_NAME,
             role="super_admin"
         ),
         User(

@@ -10,10 +10,13 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     
-    # Security
+    # Security & Initial Admin Account (override via environment variables in production)
     SECRET_KEY: str = "sentinel_super_secret_enterprise_jwt_key_replace_in_prod_32bytes_minimum!"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 480  # 8 hours
+    ADMIN_EMAIL: str = "admin@sentinel.defense.org"
+    ADMIN_PASSWORD: str = "SentinelAdmin2026!"
+    ADMIN_FULL_NAME: str = "Platform Administrator"
     
     # Database
     DATABASE_URL: str = "sqlite:///./sentinel.db"

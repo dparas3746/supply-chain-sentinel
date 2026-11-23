@@ -7,7 +7,10 @@ import {
   RemediationTask,
   Supplier,
   SecurityAlert,
-  User
+  User,
+  AdminOverview,
+  AdminUser,
+  AuditLogEntry
 } from '../types';
 
 const API_BASE = `${(import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')}/api/v1`;
@@ -48,6 +51,10 @@ class ApiClient {
     });
 
     if (!res.ok) {
+      if (res.status === 401 && !endpoint.startsWith('/auth/login') && !endpoint.startsWith('/auth/register')) {
+        this.clearToken();
+        window.dispatchEvent(new Event('sentinel:unauthorized'));
+      }
       let errorMsg = `API Error: ${res.status} ${res.statusText}`;
       try {
         const errorData = await res.json();
@@ -73,6 +80,19 @@ class ApiClient {
     });
     this.setToken(data.access_token);
     return data;
+  }
+
+  async register(full_name: string, email: string, password: string): Promise<{ access_token: string; user: User }> {
+    const data = await this.request<{ access_token: string; user: User }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ full_name, email, password }),
+    });
+    this.setToken(data.access_token);
+    return data;
+  }
+
+  logout() {
+    this.clearToken();
   }
 
   async getMe(): Promise<User> {
@@ -246,6 +266,26 @@ class ApiClient {
 
   async exportVulnerabilitiesCsv(): Promise<string> {
     return this.request<string>('/reports/vulnerabilities/export/csv');
+  }
+
+  // Administration (Admin Roles Only)
+  async getAdminOverview(): Promise<AdminOverview> {
+    return this.request<AdminOverview>('/admin/overview');
+  }
+
+  async getAdminUsers(): Promise<AdminUser[]> {
+    return this.request<AdminUser[]>('/admin/users');
+  }
+
+  async updateAdminUser(userId: string, update: { role?: string; is_active?: boolean }): Promise<AdminUser> {
+    return this.request<AdminUser>(`/admin/users/${userId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(update),
+    });
+  }
+
+  async getAuditLogs(): Promise<AuditLogEntry[]> {
+    return this.request<AuditLogEntry[]>('/admin/audit-logs');
   }
 }
 

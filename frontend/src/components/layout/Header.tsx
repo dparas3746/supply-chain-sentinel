@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bell, Shield, UserCircle2, RefreshCw } from 'lucide-react';
+import { Bell, UserCircle2, RefreshCw, LogOut } from 'lucide-react';
 import { User } from '../../types';
 
 interface HeaderProps {
@@ -8,6 +8,7 @@ interface HeaderProps {
   onRefresh?: () => void;
   isRefreshing?: boolean;
   onSelectView: (view: string) => void;
+  onLogout?: () => void;
   alertCount?: number;
 }
 
@@ -17,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
   onRefresh,
   isRefreshing = false,
   onSelectView,
+  onLogout,
   alertCount = 2,
 }) => {
   const viewTitles: Record<string, { title: string; subtitle: string }> = {
@@ -32,6 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
     suppliers: { title: 'Third-Party Supplier Risk', subtitle: 'Vendor concentration, trust tiers, and software provenance' },
     alerts: { title: 'Continuous Monitoring & Security Alerts', subtitle: 'Threat disclosures and overdue SLA telemetry' },
     reports: { title: 'Executive Cybersecurity Reporting', subtitle: 'CISO-ready management briefings and CSV/audit exports' },
+    admin: { title: 'Admin & Backend Console', subtitle: 'Role-based user administration, system posture, and audit trails' },
   };
 
   const current = viewTitles[currentView] || { title: 'Supply Chain Sentinel', subtitle: 'Risk Intelligence Platform' };
@@ -92,6 +95,15 @@ export const Header: React.FC<HeaderProps> = ({
               {user ? user.role.replace('_', ' ') : 'Security Analyst'}
             </div>
           </div>
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              title="Sign Out"
+              className="ml-1 p-1.5 text-slate-400 hover:text-red-400 rounded-lg hover:bg-slate-800 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     </header>
